@@ -3,6 +3,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.core.exceptions import ImproperlyConfigured
 from django.core import serializers
 from django.conf import settings
+import base64
 import httplib2
 
 try:
@@ -120,7 +121,11 @@ class PostmarkMessage(dict):
             
             if message.attachments and isinstance(message.attachments, list):
                 if len(message.attachments):
-                    message_dict["Attachments"] = message.attachments
+                    message_dict["Attachments"] = [{
+                        'Name': n,
+                        'Content': base64.encodestring(c).strip(),
+                        'ContentType': ct,
+                    } for n, c, ct in message.attachments]
             
         except:
             if fail_silently:
