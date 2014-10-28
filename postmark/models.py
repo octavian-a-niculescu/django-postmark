@@ -1,10 +1,8 @@
-from django.utils.translation import ugettext_lazy as _
-from django.dispatch import receiver
+from dateutil.parser import parse as parsedatetime
 from django.db import models
+from django.dispatch import receiver
+from django.utils.translation import ugettext_lazy as _
 from itertools import izip_longest
-from datetime import datetime
-from pytz import timezone
-import pytz
 
 from postmark.signals import post_send
 
@@ -37,77 +35,78 @@ BOUNCE_TYPES = (
     ("Blocked", _("Blocked")),
 )
 
+
 class EmailMessage(models.Model):
     message_id = models.CharField(_("Message ID"), max_length=40)
     submitted_at = models.DateTimeField(_("Submitted At"))
     status = models.CharField(_("Status"), max_length=150)
-    
+
     to = models.CharField(_("To"), max_length=150)
     to_type = models.CharField(_("Type"), max_length=3, choices=TO_CHOICES)
-    
+
     sender = models.CharField(_("Sender"), max_length=150)
     reply_to = models.CharField(_("Reply To"), max_length=150)
     subject = models.CharField(_("Subject"), max_length=150)
     tag = models.CharField(_("Tag"), max_length=150)
     text_body = models.TextField(_("Text Body"))
     html_body = models.TextField(_("HTML Body"))
-    
+
     headers = models.TextField(_("Headers"))
     attachments = models.TextField(_("Attachments"))
-    
+
     def __unicode__(self):
         return u"%s" % (self.message_id,)
-    
+
     class Meta:
         verbose_name = _("email message")
         verbose_name_plural = _("email messages")
-        
+
         get_latest_by = "submitted_at"
         ordering = ["-submitted_at"]
 
+
 class EmailBounce(models.Model):
     id = models.PositiveIntegerField(primary_key=True)
-    message = models.ForeignKey(EmailMessage, related_name="bounces", verbose_name=_("Message"))
-    
-    inactive = models.BooleanField(_("Inactive"))
-    can_activate = models.BooleanField(_("Can Activate"))
-    
+    message = models.ForeignKey(
+        EmailMessage, related_name="bounces", verbose_name=_("Message"))
+
+    inactive = models.BooleanField(_("Inactive"), default=False)
+    can_activate = models.BooleanField(_("Can Activate"), default=False)
+
     type = models.CharField(_("Type"), max_length=100, choices=BOUNCE_TYPES)
     description = models.TextField(_("Description"))
     details = models.TextField(_("Details"))
-    
+
     bounced_at = models.DateTimeField(_("Bounced At"))
-    
+
     def __unicode__(self):
         return u"Bounce: %s" % (self.message.to,)
-    
+
     class Meta:
         verbose_name = _("email bounce")
         verbose_name_plural = _("email bounces")
-        
+
         order_with_respect_to = "message"
         get_latest_by = "bounced_at"
         ordering = ["-bounced_at"]
+
 
 @receiver(post_send)
 def sent_message(sender, **kwargs):
     msg = kwargs["message"]
     resp = kwargs["response"]
-    
+
     for recipient in (
         list(izip_longest(msg["To"].split(","), [], fillvalue='to')) +
         list(izip_longest(msg.get("Cc", "").split(","), [], fillvalue='cc')) +
-        list(izip_longest(msg.get("Bcc", "").split(","), [], fillvalue='bcc'))):
-        
+        list(izip_longest(msg.get("Bcc", "").split(","), [], fillvalue='bcc'))
+    ):
+
         if not recipient[0]:
             continue
-        
-        timestamp, tz = resp["SubmittedAt"].rsplit("+", 1)
-        tz_offset = int(tz.split(":", 1)[0])
-        tz = timezone("Etc/GMT%s%d" % ("+" if tz_offset >= 0 else "-", tz_offset))
-        submitted_at = tz.localize(datetime.strptime(timestamp[:26], POSTMARK_DATETIME_STRING)).astimezone(pytz.utc)
-        
-        
+
+        submitted_at = parsedatetime(resp['SubmittedAt'])
+
         emsg = EmailMessage(
             message_id=resp["MessageID"],
             submitted_at=submitted_at,

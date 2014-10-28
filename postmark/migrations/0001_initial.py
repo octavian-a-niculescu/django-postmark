@@ -1,86 +1,68 @@
-# encoding: utf-8
-import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
-class Migration(SchemaMigration):
-
-    def forwards(self, orm):
-        
-        # Adding model 'EmailMessage'
-        db.create_table('postmark_emailmessage', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('message_id', self.gf('django.db.models.fields.CharField')(max_length=40)),
-            ('submitted_at', self.gf('django.db.models.fields.DateTimeField')()),
-            ('status', self.gf('django.db.models.fields.CharField')(max_length=150)),
-            ('to', self.gf('django.db.models.fields.CharField')(max_length=150)),
-            ('to_type', self.gf('django.db.models.fields.CharField')(max_length=3)),
-            ('sender', self.gf('django.db.models.fields.CharField')(max_length=150)),
-            ('reply_to', self.gf('django.db.models.fields.CharField')(max_length=150)),
-            ('subject', self.gf('django.db.models.fields.CharField')(max_length=150)),
-            ('tag', self.gf('django.db.models.fields.CharField')(max_length=25)),
-            ('text_body', self.gf('django.db.models.fields.TextField')()),
-            ('html_body', self.gf('django.db.models.fields.TextField')()),
-            ('headers', self.gf('django.db.models.fields.TextField')()),
-            ('attachments', self.gf('django.db.models.fields.TextField')()),
-        ))
-        db.send_create_signal('postmark', ['EmailMessage'])
-
-        # Adding model 'EmailBounce'
-        db.create_table('postmark_emailbounce', (
-            ('id', self.gf('django.db.models.fields.PositiveIntegerField')(primary_key=True)),
-            ('message', self.gf('django.db.models.fields.related.ForeignKey')(related_name='bounces', to=orm['postmark.EmailMessage'])),
-            ('inactive', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('can_activate', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('type', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('details', self.gf('django.db.models.fields.TextField')()),
-            ('bounced_at', self.gf('django.db.models.fields.DateTimeField')()),
-            ('_order', self.gf('django.db.models.fields.IntegerField')(default=0)),
-        ))
-        db.send_create_signal('postmark', ['EmailBounce'])
+from django.db import models, migrations
 
 
-    def backwards(self, orm):
-        
-        # Deleting model 'EmailMessage'
-        db.delete_table('postmark_emailmessage')
+class Migration(migrations.Migration):
 
-        # Deleting model 'EmailBounce'
-        db.delete_table('postmark_emailbounce')
+    dependencies = [
+    ]
 
-
-    models = {
-        'postmark.emailbounce': {
-            'Meta': {'ordering': "('_order',)", 'object_name': 'EmailBounce'},
-            '_order': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'bounced_at': ('django.db.models.fields.DateTimeField', [], {}),
-            'can_activate': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'description': ('django.db.models.fields.TextField', [], {}),
-            'details': ('django.db.models.fields.TextField', [], {}),
-            'id': ('django.db.models.fields.PositiveIntegerField', [], {'primary_key': 'True'}),
-            'inactive': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'message': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'bounces'", 'to': "orm['postmark.EmailMessage']"}),
-            'type': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'postmark.emailmessage': {
-            'Meta': {'ordering': "['-submitted_at']", 'object_name': 'EmailMessage'},
-            'attachments': ('django.db.models.fields.TextField', [], {}),
-            'headers': ('django.db.models.fields.TextField', [], {}),
-            'html_body': ('django.db.models.fields.TextField', [], {}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'message_id': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
-            'reply_to': ('django.db.models.fields.CharField', [], {'max_length': '150'}),
-            'sender': ('django.db.models.fields.CharField', [], {'max_length': '150'}),
-            'status': ('django.db.models.fields.CharField', [], {'max_length': '150'}),
-            'subject': ('django.db.models.fields.CharField', [], {'max_length': '150'}),
-            'submitted_at': ('django.db.models.fields.DateTimeField', [], {}),
-            'tag': ('django.db.models.fields.CharField', [], {'max_length': '25'}),
-            'text_body': ('django.db.models.fields.TextField', [], {}),
-            'to': ('django.db.models.fields.CharField', [], {'max_length': '150'}),
-            'to_type': ('django.db.models.fields.CharField', [], {'max_length': '3'})
-        }
-    }
-
-    complete_apps = ['postmark']
+    operations = [
+        migrations.CreateModel(
+            name='EmailBounce',
+            fields=[
+                ('id', models.PositiveIntegerField(serialize=False, primary_key=True)),
+                ('inactive', models.BooleanField(verbose_name='Inactive')),
+                ('can_activate', models.BooleanField(verbose_name='Can Activate')),
+                ('type', models.CharField(max_length=100, verbose_name='Type', choices=[(b'HardBounce', 'Hard Bounce'), (b'Transient', 'Transient'), (b'Unsubscribe', 'Unsubscribe'), (b'Subscribe', 'Subscribe'), (b'AutoResponder', 'Auto Responder'), (b'AddressChange', 'Address Change'), (b'DnsError', 'DNS Error'), (b'SpamNotification', 'Spam Notification'), (b'OpenRelayTest', 'Open Relay Test'), (b'Unknown', 'Unknown'), (b'SoftBounce', 'Soft Bounce'), (b'VirusNotification', 'Virus Notification'), (b'ChallengeVerification', 'Challenge Verification'), (b'BadEmailAddress', 'Bad Email Address'), (b'SpamComplaint', 'Spam Complaint'), (b'ManuallyDeactivated', 'Manually Deactivated'), (b'Unconfirmed', 'Unconfirmed'), (b'Blocked', 'Blocked')])),
+                ('description', models.TextField(verbose_name='Description')),
+                ('details', models.TextField(verbose_name='Details')),
+                ('bounced_at', models.DateTimeField(verbose_name='Bounced At')),
+            ],
+            options={
+                'ordering': ['-bounced_at'],
+                'get_latest_by': 'bounced_at',
+                'verbose_name': 'email bounce',
+                'verbose_name_plural': 'email bounces',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='EmailMessage',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('message_id', models.CharField(max_length=40, verbose_name='Message ID')),
+                ('submitted_at', models.DateTimeField(verbose_name='Submitted At')),
+                ('status', models.CharField(max_length=150, verbose_name='Status')),
+                ('to', models.CharField(max_length=150, verbose_name='To')),
+                ('to_type', models.CharField(max_length=3, verbose_name='Type', choices=[(b'to', 'Recipient'), (b'cc', 'Carbon Copy'), (b'bcc', 'Blind Carbon Copy')])),
+                ('sender', models.CharField(max_length=150, verbose_name='Sender')),
+                ('reply_to', models.CharField(max_length=150, verbose_name='Reply To')),
+                ('subject', models.CharField(max_length=150, verbose_name='Subject')),
+                ('tag', models.CharField(max_length=150, verbose_name='Tag')),
+                ('text_body', models.TextField(verbose_name='Text Body')),
+                ('html_body', models.TextField(verbose_name='HTML Body')),
+                ('headers', models.TextField(verbose_name='Headers')),
+                ('attachments', models.TextField(verbose_name='Attachments')),
+            ],
+            options={
+                'ordering': ['-submitted_at'],
+                'get_latest_by': 'submitted_at',
+                'verbose_name': 'email message',
+                'verbose_name_plural': 'email messages',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.AddField(
+            model_name='emailbounce',
+            name='message',
+            field=models.ForeignKey(related_name='bounces', verbose_name='Message', to='postmark.EmailMessage'),
+            preserve_default=True,
+        ),
+        migrations.AlterOrderWithRespectTo(
+            name='emailbounce',
+            order_with_respect_to='message',
+        ),
+    ]
