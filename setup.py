@@ -17,6 +17,7 @@ setup(
     packages=[
         "postmark",
         "postmark.migrations",
+        "postmark.south_migrations",
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
