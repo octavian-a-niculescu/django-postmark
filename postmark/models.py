@@ -88,7 +88,6 @@ class EmailBounce(models.Model):
 
         order_with_respect_to = "message"
         get_latest_by = "bounced_at"
-        ordering = ["-bounced_at"]
 
 
 @receiver(post_send)
