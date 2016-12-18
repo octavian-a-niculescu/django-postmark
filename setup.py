@@ -12,7 +12,7 @@ setup(
     install_requires=[
         "httplib2",
         "pytz",
-        "python-dateutil",
+        "iso8601",
     ],
     packages=[
         "postmark",

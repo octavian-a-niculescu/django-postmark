@@ -1,12 +1,11 @@
-from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseBadRequest, HttpResponseForbidden
-from django.core.exceptions import ImproperlyConfigured
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404
-from django.conf import settings
-from datetime import datetime
-from pytz import timezone
-import pytz
 import base64
+
+import iso8601
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseForbidden
+from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 
 from postmark.models import EmailMessage, EmailBounce
 
@@ -71,11 +70,8 @@ def bounce(request):
         
         bounce_dict = json.loads(request.read())
             
-        timestamp, tz = bounce_dict["BouncedAt"].rsplit("+", 1)
-        tz_offset = int(tz.split(":", 1)[0])
-        tz = timezone("Etc/GMT%s%d" % ("+" if tz_offset >= 0 else "-", tz_offset))
-        bounced_at = tz.localize(datetime.strptime(timestamp[:26], POSTMARK_DATETIME_STRING)).astimezone(pytz.utc)
-            
+        bounced_at = iso8601.parse_date(bounce_dict["BouncedAt"])
+
         em = get_object_or_404(EmailMessage, message_id=bounce_dict["MessageID"], to=bounce_dict["Email"])
         eb, created = EmailBounce.objects.get_or_create(
             id=bounce_dict["ID"],

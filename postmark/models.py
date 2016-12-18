@@ -1,8 +1,9 @@
-from dateutil.parser import parse as parsedatetime
+from itertools import izip_longest
+
 from django.db import models
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
-from itertools import izip_longest
+from iso8601 import parse_date
 
 from postmark.signals import post_send
 
@@ -104,7 +105,7 @@ def sent_message(sender, **kwargs):
         if not recipient[0]:
             continue
 
-        submitted_at = parsedatetime(resp['SubmittedAt'])
+        submitted_at = parse_date(resp['SubmittedAt'])
 
         emsg = EmailMessage(
             message_id=resp["MessageID"],
