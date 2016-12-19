@@ -1,7 +1,10 @@
+import json
 from itertools import izip_longest
 
+from django.contrib.postgres.fields import HStoreField
 from django.db import models
 from django.dispatch import receiver
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from iso8601 import parse_date
 
@@ -52,7 +55,7 @@ class EmailMessage(models.Model):
     text_body = models.TextField(_("Text Body"))
     html_body = models.TextField(_("HTML Body"))
 
-    headers = models.TextField(_("Headers"))
+    headers = HStoreField(_("Headers"))
     attachments = models.TextField(_("Attachments"))
 
     def __unicode__(self):
@@ -107,6 +110,12 @@ def sent_message(sender, **kwargs):
 
         submitted_at = parse_date(resp['SubmittedAt'])
 
+        headers_list = msg.get('Headers')
+        headers = {
+            item['Name']: force_text(item['Value'])
+            for item in headers_list
+        } if headers_list is not None else {}
+
         emsg = EmailMessage(
             message_id=resp["MessageID"],
             submitted_at=submitted_at,
@@ -119,7 +128,7 @@ def sent_message(sender, **kwargs):
             tag=msg.get("Tag", ""),
             text_body=msg["TextBody"],
             html_body=msg.get("HtmlBody", ""),
-            headers=msg.get("Headers", ""),
+            headers=headers,
             attachments=msg.get("Attachments", "")
         )
         emsg.save()
