@@ -1,7 +1,7 @@
 import json
 from itertools import izip_longest
 
-from django.contrib.postgres.fields import HStoreField
+from django.contrib.postgres.fields import HStoreField, JSONField
 from django.db import models
 from django.dispatch import receiver
 from django.utils.encoding import force_text
@@ -56,7 +56,7 @@ class EmailMessage(models.Model):
     html_body = models.TextField(_("HTML Body"))
 
     headers = HStoreField(_("Headers"))
-    attachments = models.TextField(_("Attachments"))
+    attachments = JSONField(_("Attachments"))
 
     def __unicode__(self):
         return u"%s" % (self.message_id,)
@@ -129,6 +129,6 @@ def sent_message(sender, **kwargs):
             text_body=msg["TextBody"],
             html_body=msg.get("HtmlBody", ""),
             headers=headers,
-            attachments=msg.get("Attachments", "")
+            attachments=msg.get("Attachments", [])
         )
         emsg.save()
