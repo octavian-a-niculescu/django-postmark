@@ -7,10 +7,10 @@ from django.db import migrations
 
 def convert_to_json(apps, schema_editor):
     EmailMessage = apps.get_model('postmark.EmailMessage')
-    for e in EmailMessage.objects.filter(
-        attachments__gt=''
-    ):
+    for e in EmailMessage.objects.all():
         e.attachments = e.attachments.replace('\'', '"').replace(': u"', ': "')
+        if e.attachments == '':
+            e.attachments = '[]'
         e.save(update_fields=['attachments'])
 
 
