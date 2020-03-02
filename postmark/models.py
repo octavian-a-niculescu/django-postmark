@@ -1,5 +1,11 @@
 import json
-from itertools import zip_longest as izip_longest
+
+try:
+    # Python 3
+    from itertools import zip_longest as izip_longest
+except ImportError:
+    # Python 2
+    from itertools import izip_longest
 
 from django.contrib.postgres.fields import HStoreField, JSONField
 from django.db import models
