@@ -94,8 +94,8 @@ class PostmarkMessage(dict):
             message_dict = {}
             
             message_dict["From"] = message.from_email
-            message_dict["Subject"] = unicode(message.subject)
-            message_dict["TextBody"] = unicode(message.body)
+            message_dict["Subject"] = message.subject
+            message_dict["TextBody"] = message.body
             
             message_dict["To"] = ",".join(message.to)
             
@@ -170,7 +170,7 @@ class PostmarkBackend(BaseEmailBackend):
         http = httplib2.Http()
         
         if POSTMARK_TEST_MODE:
-            print 'JSON message is:\n%s' % json.dumps(message)
+            print('JSON message is:\n%s' % json.dumps(message))
             return
         
         try:
