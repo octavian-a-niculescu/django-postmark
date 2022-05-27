@@ -58,7 +58,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='emailbounce',
             name='message',
-            field=models.ForeignKey(related_name='bounces', verbose_name='Message', to='postmark.EmailMessage'),
+            field=models.ForeignKey(related_name='bounces', verbose_name='Message', to='postmark.EmailMessage', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterOrderWithRespectTo(
