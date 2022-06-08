@@ -10,7 +10,7 @@ except ImportError:
 from django.contrib.postgres.fields import HStoreField, JSONField
 from django.db import models
 from django.dispatch import receiver
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import ugettext_lazy as _
 from iso8601 import parse_date
 
@@ -118,7 +118,7 @@ def sent_message(sender, **kwargs):
 
         headers_list = msg.get('Headers')
         headers = {
-            item['Name']: force_text(item['Value'])
+            item['Name']: force_str(item['Value'])
             for item in headers_list
         } if headers_list is not None else {}
 

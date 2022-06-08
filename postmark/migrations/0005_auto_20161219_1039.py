@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 import json
 
 from django.db import migrations
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 
 def set_hstore(apps, schema_editor):
@@ -13,7 +13,7 @@ def set_hstore(apps, schema_editor):
 
     def transform(d):
         return {
-            item['Name']: force_text(item['Value'])
+            item['Name']: force_str(item['Value'])
             for item in d
         }
 
