@@ -7,7 +7,8 @@ except ImportError:
     # Python 2
     from itertools import izip_longest
 
-from django.contrib.postgres.fields import HStoreField, JSONField
+from django.contrib.postgres.fields import HStoreField
+from django.db.models import JSONField
 from django.db import models
 from django.dispatch import receiver
 from django.utils.encoding import force_str
