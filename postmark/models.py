@@ -11,7 +11,7 @@ from django.contrib.postgres.fields import HStoreField, JSONField
 from django.db import models
 from django.dispatch import receiver
 from django.utils.encoding import force_str
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from iso8601 import parse_date
 
 from postmark.signals import post_send

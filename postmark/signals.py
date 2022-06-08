@@ -1,3 +1,6 @@
 from django.dispatch import Signal
 
-post_send = Signal(providing_args=["message", "response"])
+try:
+    post_send = Signal(providing_args=["message", "response"])
+except:
+    post_send = Signal()
